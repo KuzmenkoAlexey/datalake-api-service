@@ -1,0 +1,38 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backend_test:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.9.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9.7
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ hashFiles('requirements.txt') }}-${{ hashFiles('requirements-dev.txt') }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Codestyle Check
+        run: |
+          black --check src
+          flake8 src
+
