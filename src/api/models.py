@@ -23,6 +23,7 @@ class BlobCreate(BaseModel):
 
 
 class Blob(BlobCreate):
+    name: typing.Optional[str] = ""
     blob_id: str
 
 
@@ -79,13 +80,15 @@ class AWSProjectDeployType(str, Enum):
 
 class GCPProjectDeployType(str, Enum):
     GCP_1 = "GCP_1"
+    GCP_2 = "GCP_2"
 
 
 class ProjectDeploy(BaseModel):
     deploy_type: constr(
         regex=(
             fr"^({AWSProjectDeployType.AWS_1.value}"  # noqa
-            fr"|{GCPProjectDeployType.GCP_1.value})$"
+            fr"|{GCPProjectDeployType.GCP_1.value}"
+            fr"|{GCPProjectDeployType.GCP_2.value})$"
         )
     )
     project_structure: typing.Optional[dict]
