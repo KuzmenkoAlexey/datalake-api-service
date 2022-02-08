@@ -3,10 +3,11 @@ import typing
 
 from fastapi import Request
 from starlette.datastructures import Headers
-from shared.data_processors.base_data_processor import ProcessedData
+
 from api.models import Tag
-from shared.data_processors.json_data_processor import JsonDataProcessor
+from shared.data_processors.base_data_processor import ProcessedData
 from shared.data_processors.default_data_processor import DefaultDataProcessor
+from shared.data_processors.json_data_processor import JsonDataProcessor
 from shared.data_processors.multipart_data_processor import MultipartDataProcessor
 from utils.logger import setup_logger
 
@@ -35,8 +36,8 @@ class GeneralDataProcessor:
         content_type = self.content_type_to_internal_content_type(
             self.get_content_type_from_headers(request.headers)
         )
-        LOGGER.error(request.headers)
-        LOGGER.error(content_type)
+        LOGGER.info(request.headers)
+        LOGGER.info(content_type)
         content_type_handler = CONTENT_TYPE_HANDLERS.get(
             content_type, DefaultDataProcessor
         )
@@ -44,7 +45,6 @@ class GeneralDataProcessor:
 
         tags = self.extract_system_tags_from_headers(request.headers)
         processed_data.system_tags.extend(tags)
-        print(repr(processed_data))
         return processed_data
 
     def extract_system_tags_from_headers(self, headers: Headers) -> list[Tag]:

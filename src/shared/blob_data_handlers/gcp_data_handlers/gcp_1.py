@@ -65,7 +65,6 @@ class GCPBlobHandler1(BaseBlobHandler):
         processed_data: ProcessedData,
         blob_id: str,
     ):
-
         deployed_resources = GCPDeployedResources1(
             **full_project_structure.deploy.project_structure
         )

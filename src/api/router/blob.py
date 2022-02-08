@@ -1,9 +1,9 @@
 from urllib import parse
 
-from fastapi import APIRouter, status, Depends, Request
+from fastapi import APIRouter, Depends, Request, status
 
 from api.dependencies import get_current_project
-from api.models import BlobCreate, Blob, FullProjectStructure, Tag
+from api.models import Blob, BlobCreate, FullProjectStructure, Tag
 from shared.blob_data_handlers import BLOB_HANDLER_CLASSES
 from shared.data_processors.general_processor import GeneralDataProcessor
 

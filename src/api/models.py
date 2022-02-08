@@ -2,7 +2,7 @@ import datetime
 import typing
 from enum import Enum
 
-from pydantic import constr, stricturl, BaseModel, UUID4, Field
+from pydantic import UUID4, BaseModel, Field, constr, stricturl
 
 
 class Tag(BaseModel):
@@ -24,7 +24,7 @@ class BlobCreate(BaseModel):
 
 class Blob(BlobCreate):
     name: typing.Optional[str] = ""
-    blob_id: str
+    blob_id: str  # UUID?
 
 
 class BlobDataJson(BaseModel):
@@ -35,6 +35,7 @@ class BlobDataBinary(BaseModel):
     data: typing.Optional[dict] = None
 
 
+# TODO: Never used
 BlobData = typing.Union[BlobDataJson]
 
 
@@ -48,11 +49,7 @@ class Project(BaseModel):
     verified: typing.Optional[bool] = False
     name: str
     service_provider: constr(
-        regex=(
-            fr"^({ServiceProviderType.AWS.value}"  # noqa
-            fr"|{ServiceProviderType.AZURE.value}"
-            fr"|{ServiceProviderType.GCP.value})$"
-        )
+        regex=fr"^({'|'.join([e.value for e in ServiceProviderType])})$"  # noqa
     )
 
 
@@ -85,11 +82,7 @@ class GCPProjectDeployType(str, Enum):
 
 class ProjectDeploy(BaseModel):
     deploy_type: constr(
-        regex=(
-            fr"^({AWSProjectDeployType.AWS_1.value}"  # noqa
-            fr"|{GCPProjectDeployType.GCP_1.value}"
-            fr"|{GCPProjectDeployType.GCP_2.value})$"
-        )
+        regex=fr"^({'|'.join([e.value for e in (*AWSProjectDeployType, *GCPProjectDeployType)])})$"  # noqa
     )
     project_structure: typing.Optional[dict]
 

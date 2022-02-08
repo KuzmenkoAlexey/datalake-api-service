@@ -6,7 +6,7 @@ from opensearchpy import OpenSearch, RequestsHttpConnection
 from pydantic import BaseModel
 from requests_aws4auth import AWS4Auth
 
-from api.models import BlobCreate, FullProjectStructure, Blob, Tag
+from api.models import Blob, BlobCreate, FullProjectStructure, Tag
 from shared.blob_data_handlers.base import BaseBlobHandler
 from shared.data_processors.base_data_processor import ProcessedData
 
