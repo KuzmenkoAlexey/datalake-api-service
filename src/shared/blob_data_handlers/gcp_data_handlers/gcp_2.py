@@ -110,7 +110,6 @@ class GCPBlobHandler2(BaseBlobHandler):
             scopes=["https://www.googleapis.com/auth/cloud-platform"],
         )
         bigtable_client = bigtable.Client(credentials=credentials, admin=True)
-        blob_id = str(uuid.uuid4())
         instance = bigtable_client.instance(deployed_resources.bigtable.instance)
         table = instance.table(deployed_resources.bigtable.table)
         row_filters_to_chain = []
