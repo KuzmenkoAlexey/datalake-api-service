@@ -5,7 +5,7 @@ from google.cloud.bigtable import row_filters
 from google.oauth2 import service_account
 from pydantic import BaseModel
 
-from api.models import BlobCreate, FullProjectStructure, Blob, Tag
+from api.models import Blob, BlobCreate, FullProjectStructure, Tag
 from shared.blob_data_handlers.base import BaseBlobHandler
 from shared.data_processors.base_data_processor import ProcessedData
 from utils.gcp import get_credentials_tmp_path
@@ -110,7 +110,6 @@ class GCPBlobHandler2(BaseBlobHandler):
             scopes=["https://www.googleapis.com/auth/cloud-platform"],
         )
         bigtable_client = bigtable.Client(credentials=credentials, admin=True)
-        blob_id = str(uuid.uuid4())
         instance = bigtable_client.instance(deployed_resources.bigtable.instance)
         table = instance.table(deployed_resources.bigtable.table)
         row_filters_to_chain = []

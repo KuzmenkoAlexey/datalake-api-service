@@ -1,6 +1,7 @@
-import sentry_sdk
 import time
-from aioprometheus import Counter, MetricsMiddleware, Summary, Histogram
+
+import sentry_sdk
+from aioprometheus import Counter, Histogram, MetricsMiddleware, Summary
 from aioprometheus.asgi.starlette import metrics
 from fastapi import FastAPI, Request
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware

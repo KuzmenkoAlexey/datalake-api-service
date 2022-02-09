@@ -1,14 +1,14 @@
 import typing
 from typing import Optional
 
+import httpx
 from fastapi import Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import JWTError, ExpiredSignatureError, jwt
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import ExpiredSignatureError, JWTError, jwt
 from pydantic import UUID4
 
-from api.models import JwtUserData, FullProjectStructure
+from api.models import FullProjectStructure, JwtUserData
 from config import settings
-import httpx
 
 
 class UnauthenticatedException(Exception):
