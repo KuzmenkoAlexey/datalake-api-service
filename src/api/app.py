@@ -6,6 +6,8 @@ from aioprometheus.asgi.starlette import metrics
 from fastapi import FastAPI, Request
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 
+from api.dependencies import UnauthenticatedException
+from api.error_handling import handle_unauthenticated_exception
 from api.router.blob import blob_router
 from config import settings
 from utils.logger import setup_logger
@@ -17,7 +19,9 @@ def get_application():
     sentry_sdk.init(dsn=settings.sentry_url, traces_sample_rate=1.0)
 
     app = FastAPI(title="API Service")
-
+    app.add_exception_handler(
+        UnauthenticatedException, handle_unauthenticated_exception
+    )
     @app.middleware("http")
     async def prometheus_stats(request: Request, call_next):
         start_time = time.time()
