@@ -22,6 +22,7 @@ def get_application():
     app.add_exception_handler(
         UnauthenticatedException, handle_unauthenticated_exception
     )
+
     @app.middleware("http")
     async def prometheus_stats(request: Request, call_next):
         start_time = time.time()
