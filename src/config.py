@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     sentry_url: str = None
     arkham_service_base_url: str = "http://datalake-deploy-service:8000"
     gcp_credentials_path: typing.Optional[str] = None
+    time_tracking_bigquery_dataset: typing.Optional[str] = None
+    time_tracking_bigquery_table: typing.Optional[str] = None
 
 
 settings = Settings()
