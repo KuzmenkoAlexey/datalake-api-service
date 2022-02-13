@@ -1,3 +1,4 @@
+import time
 from urllib import parse
 
 from fastapi import APIRouter, Depends, Request, status
@@ -6,6 +7,7 @@ from api.dependencies import get_current_project
 from api.models import Blob, BlobCreate, FullProjectStructure, Tag
 from shared.blob_data_handlers import BLOB_HANDLER_CLASSES
 from shared.data_processors.general_processor import GeneralDataProcessor
+from shared.gcp_time_tracking import TimeTrackingBigQuery
 
 blob_router = APIRouter(prefix="/v1/blobs", tags=["blobs"], dependencies=[])
 
@@ -18,7 +20,13 @@ async def create_blob(
     full_project_structure: FullProjectStructure = Depends(get_current_project),
 ) -> Blob:
     blob_handler = BLOB_HANDLER_CLASSES[full_project_structure.deploy.deploy_type]()
+    s_time = time.time()
     blob_id = await blob_handler.insert_blob(full_project_structure, blob)
+    e_time = time.time()
+
+    await TimeTrackingBigQuery.track_time(
+        "create_blob", full_project_structure.deploy.deploy_type, e_time - s_time
+    )
     return Blob(**blob.dict(), blob_id=blob_id)
 
 
@@ -30,8 +38,14 @@ async def create_blob_data(
 ):
     # TODO:
     blob_handler = BLOB_HANDLER_CLASSES[full_project_structure.deploy.deploy_type]()
+    s_time = time.time()
     processed_data = await GeneralDataProcessor().process_request(request)
     await blob_handler.update_blob_data(full_project_structure, processed_data, blob_id)
+    e_time = time.time()
+
+    await TimeTrackingBigQuery.track_time(
+        "create_blob_data", full_project_structure.deploy.deploy_type, e_time - s_time
+    )
 
 
 @blob_router.get("/{project_id}", status_code=status.HTTP_200_OK)

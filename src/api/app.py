@@ -10,6 +10,7 @@ from api.dependencies import UnauthenticatedException
 from api.error_handling import handle_unauthenticated_exception
 from api.router.blob import blob_router
 from config import settings
+from shared.gcp_time_tracking import TimeTrackingBigQuery
 from utils.logger import setup_logger
 
 LOGGER = setup_logger()
@@ -48,5 +49,7 @@ def get_application():
     )
 
     app.include_router(blob_router)
+
+    TimeTrackingBigQuery.initialize()
 
     return SentryAsgiMiddleware(app)
