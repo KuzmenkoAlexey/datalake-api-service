@@ -49,7 +49,7 @@ class Project(BaseModel):
     verified: typing.Optional[bool] = False
     name: str
     service_provider: constr(
-        regex=fr"^({'|'.join([e.value for e in ServiceProviderType])})$"  # noqa
+        regex=rf"^({'|'.join([e.value for e in ServiceProviderType])})$"  # noqa
     )
 
 
@@ -82,7 +82,7 @@ class GCPProjectDeployType(str, Enum):
 
 class ProjectDeploy(BaseModel):
     deploy_type: constr(
-        regex=fr"^({'|'.join([e.value for e in (*AWSProjectDeployType, *GCPProjectDeployType)])})$"  # noqa
+        regex=rf"^({'|'.join([e.value for e in (*AWSProjectDeployType, *GCPProjectDeployType)])})$"  # noqa
     )
     project_structure: typing.Optional[dict]
 
