@@ -105,7 +105,7 @@ class GCPBlobHandler1(BaseBlobHandler):
         )
 
         sql = f"""
-            SELECT DISTINCT 
+            SELECT DISTINCT
                 id,
                 file,
                 table.name,
@@ -129,7 +129,7 @@ class GCPBlobHandler1(BaseBlobHandler):
                 sql += "\nAND\n"
 
             sql += f"""
-            \n((user_tags.name = @tag_name_{i} AND user_tags.value = @tag_value_{i}) 
+            \n((user_tags.name = @tag_name_{i} AND user_tags.value = @tag_value_{i})
             OR (system_tags.name = @tag_name_{i} AND system_tags.value = @tag_value_{i}))
             """
             query_parameters.extend(
