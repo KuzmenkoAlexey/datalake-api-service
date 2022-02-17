@@ -9,7 +9,7 @@ httpx==0.22.0
 aioprometheus[starlette]==21.9.1
 
 # AWS
-boto3==1.21.0
+boto3==1.21.1
 botocore==1.24.0
 requests-aws4auth==1.1.1
 opensearch-py==1.0.0
