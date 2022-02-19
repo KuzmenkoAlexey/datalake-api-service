@@ -8,6 +8,7 @@ COPY requirements.txt /usr/app
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
+RUN apt update && apt install -y exiftool
 
 COPY src /usr/app
 

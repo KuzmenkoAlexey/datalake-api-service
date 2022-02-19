@@ -7,8 +7,10 @@ from starlette.datastructures import Headers
 from api.models import Tag
 from shared.data_processors.base_data_processor import ProcessedData
 from shared.data_processors.default_data_processor import DefaultDataProcessor
+from shared.data_processors.images_jpeg_processor import ImagesJpegProcessor
 from shared.data_processors.json_data_processor import JsonDataProcessor
 from shared.data_processors.multipart_data_processor import MultipartDataProcessor
+from shared.data_processors.text_processor import TextProcessor
 from utils.logger import setup_logger
 
 LOGGER = setup_logger()
@@ -24,6 +26,9 @@ class ContentType(str, enum.Enum):
 
 CONTENT_TYPE_HANDLERS = {
     ContentType.JSON_CONTENT_TYPE: JsonDataProcessor,
+    ContentType.TEXT_HTML_CONTENT_TYPE: TextProcessor,
+    ContentType.TEXT_PLAIN_CONTENT_TYPE: TextProcessor,
+    ContentType.IMAGE_JPEG_CONTENT_TYPE: ImagesJpegProcessor,
     ContentType.MULTIPART_FORM_DATA_CONTENT_TYPE: MultipartDataProcessor,
 }
 
