@@ -59,5 +59,15 @@ async def search_by_tags(
         parse.parse_qsl(parse.urlsplit(str(request.url)).query, keep_blank_values=True)
     )
     tags = [Tag(name=k, value=v) for k, v in params.items()]
+    s_time = time.time()
     response = await blob_handler.search_by_tags(full_project_structure, tags)
+    e_time = time.time()
+
+    await TimeTrackingBigQuery.track_time(
+        "search_by_tags",
+        full_project_structure.deploy.deploy_type,
+        e_time - s_time,
+        len(tags),
+        len(response),
+    )
     return response
