@@ -1,5 +1,5 @@
 fastapi==0.74.0
-uvicorn==0.15.0
+uvicorn==0.17.5
 pydantic==1.9.0
 motor==2.5.1
 sentry-sdk==1.5.5
@@ -7,6 +7,9 @@ python-jose==3.3.0
 httpx==0.22.0
 
 aioprometheus[starlette]==21.9.1
+
+# Image processing
+PyExifTool==0.4.13
 
 # AWS
 boto3==1.21.0
