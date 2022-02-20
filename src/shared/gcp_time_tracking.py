@@ -38,15 +38,28 @@ class TimeTrackingBigQuery:
             cls.project = cls.client.project
 
     @classmethod
-    async def track_time(cls, request_type: str, deploy_type: str, request_time: float):
+    async def track_time(
+        cls,
+        request_type: str,
+        deploy_type: str,
+        request_time: float,
+        number_of_tags: typing.Optional[int] = None,
+        number_of_blobs: typing.Optional[int] = None,
+    ):
         if cls.client:
-            cls.client.insert_rows_json(
+            errors = cls.client.insert_rows_json(
                 f"{cls.project}.{cls.dataset_name}.{cls.table_name}",
                 [
                     {
                         "request_type": request_type,
                         "deploy_type": deploy_type,
                         "request_time": request_time,
+                        # search fields
+                        "number_of_tags": number_of_tags,
+                        "number_of_blobs": number_of_blobs,
                     }
                 ],
             )
+            if errors:
+                for error in errors:
+                    LOGGER.error(error)

@@ -1,0 +1,27 @@
+[
+  {
+    "mode": "NULLABLE",
+    "name": "request_type",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "deploy_type",
+    "type": "STRING"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "request_time",
+    "type": "FLOAT"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "number_of_tags",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "number_of_blobs",
+    "type": "INTEGER"
+  }
+]
