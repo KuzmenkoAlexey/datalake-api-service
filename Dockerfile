@@ -1,5 +1,7 @@
 FROM python:3.9.7
 
+RUN apt update && apt install -y exiftool
+
 RUN mkdir -p /usr/app
 
 WORKDIR /usr/app
