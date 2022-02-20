@@ -1,5 +1,7 @@
 FROM python:3.9.7
 
+RUN apt update && apt install -y exiftool
+
 RUN mkdir -p /usr/app
 
 WORKDIR /usr/app
@@ -8,7 +10,6 @@ COPY requirements.txt /usr/app
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
-RUN apt update && apt install -y exiftool
 
 COPY src /usr/app
 
