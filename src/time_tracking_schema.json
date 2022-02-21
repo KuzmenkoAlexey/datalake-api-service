@@ -23,5 +23,15 @@
     "mode": "NULLABLE",
     "name": "number_of_blobs",
     "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "size",
+    "type": "INTEGER"
+  },
+  {
+    "mode": "NULLABLE",
+    "name": "content_type",
+    "type": "STRING"
   }
 ]

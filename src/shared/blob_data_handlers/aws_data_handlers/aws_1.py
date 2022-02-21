@@ -9,6 +9,9 @@ from requests_aws4auth import AWS4Auth
 from api.models import Blob, BlobCreate, FullProjectStructure, Tag
 from shared.blob_data_handlers.base import BaseBlobHandler
 from shared.data_processors.base_data_processor import ProcessedData
+from utils.logger import setup_logger
+
+LOGGER = setup_logger()
 
 
 class S3DeployedResource(BaseModel):
@@ -44,7 +47,7 @@ class AWSBlobHandler1(BaseBlobHandler):
                     # TODO: get this host from ARN
                     "host": (
                         f"search-{deployed_resources.opensearch.domain_name}-"
-                        f"twwhb2t43nyoszfck3xw5wc3xi.us-east-1.es.amazonaws.com"
+                        f"eprtzhto67uu64bdvpgr3sebae.us-east-1.es.amazonaws.com"
                     ),
                     "port": 443,
                 }
@@ -96,7 +99,7 @@ class AWSBlobHandler1(BaseBlobHandler):
                     # TODO: get this host from ARN
                     "host": (
                         f"search-{deployed_resources.opensearch.domain_name}-"
-                        f"twwhb2t43nyoszfck3xw5wc3xi.us-east-1.es.amazonaws.com"
+                        f"eprtzhto67uu64bdvpgr3sebae.us-east-1.es.amazonaws.com"
                     ),
                     "port": 443,
                 }
@@ -140,7 +143,7 @@ class AWSBlobHandler1(BaseBlobHandler):
                     # TODO: get this host from ARN
                     "host": (
                         f"search-{deployed_resources.opensearch.domain_name}-"
-                        f"twwhb2t43nyoszfck3xw5wc3xi.us-east-1.es.amazonaws.com"
+                        f"eprtzhto67uu64bdvpgr3sebae.us-east-1.es.amazonaws.com"
                     ),
                     "port": 443,
                 }
