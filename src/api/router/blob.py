@@ -42,9 +42,20 @@ async def create_blob_data(
     processed_data = await GeneralDataProcessor().process_request(request)
     await blob_handler.update_blob_data(full_project_structure, processed_data, blob_id)
     e_time = time.time()
-
+    system_tags = processed_data.dict()["system_tags"]
+    content_size = None
+    content_type = None
+    for st in system_tags:
+        if st["name"] == "content-length":
+            content_size = st["value"]
+        elif st["name"] == "content-type":
+            content_type = st["value"]
     await TimeTrackingBigQuery.track_time(
-        "create_blob_data", full_project_structure.deploy.deploy_type, e_time - s_time
+        "create_blob_data",
+        full_project_structure.deploy.deploy_type,
+        e_time - s_time,
+        content_type=content_type,
+        content_size=content_size,
     )
 
 

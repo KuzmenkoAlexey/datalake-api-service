@@ -45,6 +45,8 @@ class TimeTrackingBigQuery:
         request_time: float,
         number_of_tags: typing.Optional[int] = None,
         number_of_blobs: typing.Optional[int] = None,
+        content_size: typing.Optional[int] = None,
+        content_type: typing.Optional[str] = None,
     ):
         if cls.client:
             errors = cls.client.insert_rows_json(
@@ -57,6 +59,9 @@ class TimeTrackingBigQuery:
                         # search fields
                         "number_of_tags": number_of_tags,
                         "number_of_blobs": number_of_blobs,
+                        # blob_create fields
+                        "size": content_size,
+                        "content_type": content_type,
                     }
                 ],
             )

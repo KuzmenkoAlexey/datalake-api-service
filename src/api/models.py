@@ -35,10 +35,6 @@ class BlobDataBinary(BaseModel):
     data: typing.Optional[dict] = None
 
 
-# TODO: Never used
-BlobData = typing.Union[BlobDataJson]
-
-
 class ServiceProviderType(str, Enum):
     AWS = "AWS"
     AZURE = "AZURE"
