@@ -2,7 +2,7 @@ fastapi==0.74.1
 uvicorn==0.17.5
 pydantic==1.9.0
 motor==2.5.1
-sentry-sdk==1.5.5
+sentry-sdk==1.5.6
 python-jose==3.3.0
 httpx==0.22.0
 
