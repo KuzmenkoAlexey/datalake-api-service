@@ -9,7 +9,7 @@ httpx==0.22.0
 # aioprometheus[starlette]==21.9.1
 
 # Image processing
-PyExifTool==0.4.13
+PyExifTool==0.5.0
 
 # AWS
 boto3==1.21.4
