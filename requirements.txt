@@ -13,7 +13,7 @@ PyExifTool==0.4.13
 
 # AWS
 boto3==1.21.4
-botocore==1.24.4
+botocore==1.24.9
 requests-aws4auth==1.1.1
 opensearch-py==1.0.0
 
