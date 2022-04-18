@@ -20,4 +20,4 @@ opensearch-py==1.0.0
 # GCP
 google-cloud-bigquery==2.34.1
 google-cloud-bigtable==2.6.0
-google-cloud-storage==2.1.0
+google-cloud-storage==2.3.0
