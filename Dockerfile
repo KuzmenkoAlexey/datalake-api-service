@@ -1,4 +1,4 @@
-FROM python:3.9.10
+FROM python:3.10.4 as production
 
 RUN apt update && apt install -y exiftool
 

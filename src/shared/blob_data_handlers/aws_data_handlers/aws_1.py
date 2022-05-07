@@ -1,12 +1,10 @@
-import uuid
-
 from boto3 import client
 from botocore.client import Config
 from opensearchpy import OpenSearch, RequestsHttpConnection
 from pydantic import BaseModel
 from requests_aws4auth import AWS4Auth
 
-from api.models import Blob, BlobCreate, FullProjectStructure, Tag
+from api.models import Blob, FullProjectStructure, Tag
 from shared.blob_data_handlers.base import BaseBlobHandler
 from shared.data_processors.base_data_processor import ProcessedData
 from utils.logger import setup_logger
@@ -20,6 +18,7 @@ class S3DeployedResource(BaseModel):
 
 class OpenSearchResource(BaseModel):
     domain_name: str
+    endpoint: str
 
 
 class AWSDeployedResources1(BaseModel):
@@ -28,47 +27,13 @@ class AWSDeployedResources1(BaseModel):
 
 
 class AWSBlobHandler1(BaseBlobHandler):
-    async def insert_blob(
-        self, full_project_structure: FullProjectStructure, blob_create: BlobCreate
-    ) -> str:
-        deployed_resources = AWSDeployedResources1(
-            **full_project_structure.deploy.project_structure
-        )
-        awsauth = AWS4Auth(
-            full_project_structure.credentials.access_key_id,
-            full_project_structure.credentials.secret_access_key,
-            "us-east-1",
-            "es",
-            session_token=None,
-        )
-        search = OpenSearch(
-            hosts=[
-                {
-                    # TODO: get this host from ARN
-                    "host": (
-                        f"search-{deployed_resources.opensearch.domain_name}-"
-                        f"eprtzhto67uu64bdvpgr3sebae.us-east-1.es.amazonaws.com"
-                    ),
-                    "port": 443,
-                }
-            ],
-            http_auth=awsauth,
-            use_ssl=True,
-            verify_certs=True,
-            connection_class=RequestsHttpConnection,
-        )
-        doc = blob_create.dict()
-        blob_id = str(uuid.uuid4())
-        doc["id"] = blob_id
-        search.index(index="test", doc_type="_doc", body=doc, id=blob_id)
-        return blob_id
-
     async def update_blob_data(
         self,
         full_project_structure: FullProjectStructure,
         processed_data: ProcessedData,
         blob_id: str,
     ):
+        blob_d = await self.get_blob_from_first_step(blob_id)
         deployed_resources = AWSDeployedResources1(
             **full_project_structure.deploy.project_structure
         )
@@ -94,39 +59,24 @@ class AWSBlobHandler1(BaseBlobHandler):
             session_token=None,
         )
         search = OpenSearch(
-            hosts=[
-                {
-                    # TODO: get this host from ARN
-                    "host": (
-                        f"search-{deployed_resources.opensearch.domain_name}-"
-                        f"eprtzhto67uu64bdvpgr3sebae.us-east-1.es.amazonaws.com"
-                    ),
-                    "port": 443,
-                }
-            ],
+            hosts=[{"host": deployed_resources.opensearch.endpoint, "port": 443}],
             http_auth=awsauth,
             use_ssl=True,
             verify_certs=True,
             connection_class=RequestsHttpConnection,
         )
         system_tags = processed_data.dict()["system_tags"]
-        new_data = {"system_tags": system_tags}
+        blob_d["system_tags"] = system_tags
 
         for st in system_tags:
             if st["name"] == "content-length":
-                new_data["size"] = st["value"]
-
-        search.update(
-            index="test",
-            doc_type="_doc",
-            id=blob_id,
-            body={"doc": new_data},
-        )
+                blob_d["size"] = st["value"]
+        search.index(index="test", doc_type="_doc", body=blob_d, id=blob_id)
+        await self.delete_blob_from_first_step(blob_id)
 
     async def search_by_tags(
         self, full_project_structure: FullProjectStructure, tags: list[Tag]
     ) -> list[Blob]:
-        # TODO:
         deployed_resources = AWSDeployedResources1(
             **full_project_structure.deploy.project_structure
         )
@@ -138,16 +88,7 @@ class AWSBlobHandler1(BaseBlobHandler):
             session_token=None,
         )
         search = OpenSearch(
-            hosts=[
-                {
-                    # TODO: get this host from ARN
-                    "host": (
-                        f"search-{deployed_resources.opensearch.domain_name}-"
-                        f"eprtzhto67uu64bdvpgr3sebae.us-east-1.es.amazonaws.com"
-                    ),
-                    "port": 443,
-                }
-            ],
+            hosts=[{"host": deployed_resources.opensearch.endpoint, "port": 443}],
             http_auth=awsauth,
             use_ssl=True,
             verify_certs=True,

@@ -10,7 +10,7 @@ client = motor.motor_asyncio.AsyncIOMotorClient(
     settings.database_url, uuidRepresentation="standard"
 )
 db = client[settings.database_name]
-gcp1_collection = db["gcp1"]
+first_step_collection = db["first_step_collection"]
 
 
 class BaseDBModel(BaseModel):
@@ -57,5 +57,5 @@ class MongoDatabase(typing.Generic[BDBM]):
         await self.collection.delete_one({"id": db_object.id})
 
 
-def get_gcp1_collection():
-    return gcp1_collection
+def get_first_step_collection():
+    return first_step_collection

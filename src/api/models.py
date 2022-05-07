@@ -67,6 +67,12 @@ class AWSCredentials(BaseModel):
     secret_access_key: constr(max_length=256)
 
 
+class AzureCredentials(BaseModel):
+    tenant_id: constr(max_length=256)
+    client_id: constr(max_length=100)
+    client_secret: constr(max_length=100)
+
+
 class AWSProjectDeployType(str, Enum):
     AWS_1 = "AWS_1"
 
@@ -76,16 +82,20 @@ class GCPProjectDeployType(str, Enum):
     GCP_2 = "GCP_2"
 
 
+class AzureProjectDeployType(str, Enum):
+    AZURE_1 = "AZURE_1"
+
+
 class ProjectDeploy(BaseModel):
     deploy_type: constr(
-        regex=rf"^({'|'.join([e.value for e in (*AWSProjectDeployType, *GCPProjectDeployType)])})$"  # noqa
+        regex=rf"^({'|'.join([e.value for e in (*AWSProjectDeployType, *GCPProjectDeployType, *AzureProjectDeployType)])})$"  # noqa
     )
     project_structure: typing.Optional[dict]
 
 
 class FullProjectStructure(BaseModel):
     project: Project
-    credentials: typing.Union[GCPCredentials, AWSCredentials]
+    credentials: typing.Union[GCPCredentials, AWSCredentials, AzureCredentials]
     deploy: ProjectDeploy
 
 

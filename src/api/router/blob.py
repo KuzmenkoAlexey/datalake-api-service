@@ -23,7 +23,6 @@ async def create_blob(
     s_time = time.time()
     blob_id = await blob_handler.insert_blob(full_project_structure, blob)
     e_time = time.time()
-
     await TimeTrackingBigQuery.track_time(
         "create_blob", full_project_structure.deploy.deploy_type, e_time - s_time
     )
