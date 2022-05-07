@@ -1,13 +1,11 @@
 import json
-import uuid
 
 from google.cloud import bigquery
 from google.cloud.bigquery._helpers import _bytes_to_json
 from google.oauth2 import service_account
 from pydantic import BaseModel
 
-from api.models import Blob, BlobCreate, FullProjectStructure, Tag
-from database.db import get_gcp1_collection
+from api.models import Blob, FullProjectStructure, Tag
 from shared.blob_data_handlers.base import BaseBlobHandler
 from shared.data_processors.base_data_processor import ProcessedData
 from utils.gcp import get_credentials_tmp_path
@@ -27,34 +25,14 @@ class GCPDeployedResources1(BaseModel):
 
 
 class GCPBlobHandler1(BaseBlobHandler):
-    async def insert_blob(
-        self, full_project_structure: FullProjectStructure, blob_create: BlobCreate
-    ) -> str:
-        gcp1_collection = get_gcp1_collection()
-        blob_id = str(uuid.uuid4())
-        blob_d = blob_create.dict()
-
-        await gcp1_collection.insert_one(
-            {
-                "id": blob_id,
-                "file": "",
-                "name": blob_d["name"],
-                "type": blob_d["content_type"],
-                "size": 0,
-                "timestamp": blob_d["timestamp"],
-                "source": blob_d["source"],
-                "user_tags": blob_d["user_tags"],
-            }
-        )
-        return blob_id
-
     async def update_blob_data(
         self,
         full_project_structure: FullProjectStructure,
         processed_data: ProcessedData,
         blob_id: str,
     ):
-        gcp1_collection = get_gcp1_collection()
+
+        blob_d = await self.get_blob_from_first_step(blob_id)
         deployed_resources = GCPDeployedResources1(
             **full_project_structure.deploy.project_structure
         )
@@ -72,14 +50,12 @@ class GCPBlobHandler1(BaseBlobHandler):
             f"{deployed_resources.bigquery.table}"
         )
 
-        blob_d = await gcp1_collection.find_one({"id": blob_id})
-        del blob_d["_id"]
         blob_d["file"] = _bytes_to_json(processed_data.data)
         blob_d["size"] = len(processed_data.data)
         blob_d["system_tags"] = [tag.dict() for tag in processed_data.system_tags]
         errors = client.insert_rows_json(table_id, [blob_d])
         if len(errors) == 0:
-            await gcp1_collection.delete_one({"id": blob_id})
+            await self.delete_blob_from_first_step(blob_id)
 
         for error in errors:
             LOGGER.error(f"Insert error: {error}")

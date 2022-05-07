@@ -27,4 +27,4 @@ class ImagesJpegProcessor(BaseDataProcessor):
 
         tags = convert_metadata_to_tags_list(metadata)
 
-        return ProcessedData(data=await request.body(), system_tags=tags)
+        return ProcessedData(data=image_data, system_tags=tags)

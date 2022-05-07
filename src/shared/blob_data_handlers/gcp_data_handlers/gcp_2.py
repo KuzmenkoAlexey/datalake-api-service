@@ -1,11 +1,9 @@
-import uuid
-
 from google.cloud import bigtable, storage
 from google.cloud.bigtable import row_filters
 from google.oauth2 import service_account
 from pydantic import BaseModel
 
-from api.models import Blob, BlobCreate, FullProjectStructure, Tag
+from api.models import Blob, FullProjectStructure, Tag
 from shared.blob_data_handlers.base import BaseBlobHandler
 from shared.data_processors.base_data_processor import ProcessedData
 from utils.gcp import get_credentials_tmp_path
@@ -27,49 +25,13 @@ class GCPDeployedResources2(BaseModel):
 
 
 class GCPBlobHandler2(BaseBlobHandler):
-    async def insert_blob(
-        self, full_project_structure: FullProjectStructure, blob_create: BlobCreate
-    ) -> str:
-        deployed_resources = GCPDeployedResources2(
-            **full_project_structure.deploy.project_structure
-        )
-        gcp_credentials_path = get_credentials_tmp_path(
-            full_project_structure.credentials
-        )
-        credentials = service_account.Credentials.from_service_account_file(
-            filename=gcp_credentials_path,
-            scopes=["https://www.googleapis.com/auth/cloud-platform"],
-        )
-        bigtable_client = bigtable.Client(credentials=credentials, admin=True)
-        blob_id = str(uuid.uuid4())
-        blob_d = blob_create.dict()
-        instance = bigtable_client.instance(deployed_resources.bigtable.instance)
-        table = instance.table(deployed_resources.bigtable.table)
-
-        cf_name = "ColumnFamily"
-
-        append_row = table.append_row(blob_id)
-
-        append_row.append_cell_value(cf_name, "id", blob_id)
-        append_row.append_cell_value(cf_name, "name", blob_d["name"])
-        append_row.append_cell_value(cf_name, "type", blob_d["content_type"])
-        append_row.append_cell_value(cf_name, "size", "0")
-        append_row.append_cell_value(cf_name, "timestamp", blob_d["timestamp"])
-        append_row.append_cell_value(cf_name, "source", blob_d["source"])
-
-        for user_tag in blob_d["user_tags"]:
-            append_row.append_cell_value(
-                cf_name, f"user_tag{user_tag['name']}", user_tag["value"]
-            )
-        append_row.commit()
-        return blob_id
-
     async def update_blob_data(
         self,
         full_project_structure: FullProjectStructure,
         processed_data: ProcessedData,
         blob_id: str,
     ):
+        blob_d = await self.get_blob_from_first_step(blob_id)
         deployed_resources = GCPDeployedResources2(
             **full_project_structure.deploy.project_structure
         )
@@ -92,9 +54,23 @@ class GCPBlobHandler2(BaseBlobHandler):
         cf_name = "ColumnFamily"
 
         append_row = table.append_row(blob_id)
+
+        append_row.append_cell_value(cf_name, "id", blob_id)
+        append_row.append_cell_value(cf_name, "name", blob_d["name"])
+        append_row.append_cell_value(cf_name, "type", blob_d["content_type"])
+        append_row.append_cell_value(cf_name, "size", "0")
+        append_row.append_cell_value(cf_name, "timestamp", blob_d["timestamp"])
+        append_row.append_cell_value(cf_name, "source", blob_d["source"])
+
+        for user_tag in blob_d["user_tags"]:
+            append_row.append_cell_value(
+                cf_name, f"user_tag{user_tag['name']}", user_tag["value"]
+            )
+
         for tag in processed_data.system_tags:
             append_row.append_cell_value(cf_name, f"system_tag{tag.name}", tag.value)
         append_row.commit()
+        await self.delete_blob_from_first_step(blob_id)
 
     async def search_by_tags(
         self, full_project_structure: FullProjectStructure, tags: list[Tag]
