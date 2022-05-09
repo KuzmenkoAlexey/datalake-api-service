@@ -18,7 +18,6 @@ class BaseBlobHandler:
         await first_step_collection.insert_one(
             {
                 "id": blob_id,
-                "file": "",
                 "name": blob_d["name"],
                 "type": blob_d["content_type"],
                 "size": 0,

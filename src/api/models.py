@@ -1,5 +1,4 @@
 import datetime
-import typing
 from enum import Enum
 
 from pydantic import UUID4, BaseModel, Field, constr, stricturl
@@ -7,32 +6,30 @@ from pydantic import UUID4, BaseModel, Field, constr, stricturl
 
 class Tag(BaseModel):
     name: str
-    value: typing.Optional[str]
+    value: str | None = None
 
 
 class BlobCreate(BaseModel):
     name: str
-    content_type: typing.Optional[str] = "application/json"
-    timestamp: typing.Optional[str] = Field(
-        default_factory=lambda: datetime.datetime.now().isoformat()
-    )
-    source: typing.Optional[str] = ""
-    user_tags: typing.Optional[list[Tag]] = []
-    system_tags: typing.Optional[list[Tag]] = []
-    size: typing.Optional[int] = 0  # in bytes
+    content_type: str = "application/json"
+    timestamp: str = Field(default_factory=lambda: datetime.datetime.now().isoformat())
+    source: str = ""
+    user_tags: list[Tag] = []
+    system_tags: list[Tag] = []
+    size: int = 0  # in bytes
 
 
 class Blob(BlobCreate):
-    name: typing.Optional[str] = ""
+    name: str = ""
     blob_id: str  # UUID?
 
 
 class BlobDataJson(BaseModel):
-    data: typing.Optional[dict] = None
+    data: dict | None = None
 
 
 class BlobDataBinary(BaseModel):
-    data: typing.Optional[dict] = None
+    data: dict | None = None
 
 
 class ServiceProviderType(str, Enum):
@@ -42,11 +39,9 @@ class ServiceProviderType(str, Enum):
 
 
 class Project(BaseModel):
-    verified: typing.Optional[bool] = False
+    verified: bool = False
     name: str
-    service_provider: constr(
-        regex=rf"^({'|'.join([e.value for e in ServiceProviderType])})$"  # noqa
-    )
+    service_provider: ServiceProviderType
 
 
 class GCPCredentials(BaseModel):
@@ -75,11 +70,13 @@ class AzureCredentials(BaseModel):
 
 class AWSProjectDeployType(str, Enum):
     AWS_1 = "AWS_1"
+    AWS_2 = "AWS_2"
 
 
 class GCPProjectDeployType(str, Enum):
     GCP_1 = "GCP_1"
     GCP_2 = "GCP_2"
+    GCP_3 = "GCP_3"
 
 
 class AzureProjectDeployType(str, Enum):
@@ -87,15 +84,13 @@ class AzureProjectDeployType(str, Enum):
 
 
 class ProjectDeploy(BaseModel):
-    deploy_type: constr(
-        regex=rf"^({'|'.join([e.value for e in (*AWSProjectDeployType, *GCPProjectDeployType, *AzureProjectDeployType)])})$"  # noqa
-    )
-    project_structure: typing.Optional[dict]
+    deploy_type: AWSProjectDeployType | GCPProjectDeployType | AzureProjectDeployType
+    project_structure: dict | None
 
 
 class FullProjectStructure(BaseModel):
     project: Project
-    credentials: typing.Union[GCPCredentials, AWSCredentials, AzureCredentials]
+    credentials: GCPCredentials | AWSCredentials | AzureCredentials
     deploy: ProjectDeploy
 
 

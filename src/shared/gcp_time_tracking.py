@@ -1,5 +1,3 @@
-import typing
-
 from google.cloud import bigquery
 from google.oauth2 import service_account
 
@@ -11,10 +9,10 @@ LOGGER = setup_logger()
 
 class TimeTrackingBigQuery:
     initialized = False
-    client: typing.Optional[bigquery.Client] = None
-    project: typing.Optional[str] = None
-    dataset_name: typing.Optional[str] = None
-    table_name: typing.Optional[str] = None
+    client: bigquery.Client | None = None
+    project: str | None = None
+    dataset_name: str | None = None
+    table_name: str | None = None
 
     @classmethod
     def initialize(cls):
@@ -43,10 +41,10 @@ class TimeTrackingBigQuery:
         request_type: str,
         deploy_type: str,
         request_time: float,
-        number_of_tags: typing.Optional[int] = None,
-        number_of_blobs: typing.Optional[int] = None,
-        content_size: typing.Optional[int] = None,
-        content_type: typing.Optional[str] = None,
+        number_of_tags: int | None = None,
+        number_of_blobs: int | None = None,
+        content_size: int | None = None,
+        content_type: str | None = None,
     ):
         if cls.client:
             errors = cls.client.insert_rows_json(

@@ -1,5 +1,4 @@
 import time
-from urllib import parse
 
 from fastapi import APIRouter, Depends, Request, status
 
@@ -8,8 +7,11 @@ from api.models import Blob, BlobCreate, FullProjectStructure, Tag
 from shared.blob_data_handlers import BLOB_HANDLER_CLASSES
 from shared.data_processors.general_processor import GeneralDataProcessor
 from shared.gcp_time_tracking import TimeTrackingBigQuery
+from utils.logger import setup_logger
 
 blob_router = APIRouter(prefix="/v1/blobs", tags=["blobs"], dependencies=[])
+
+LOGGER = setup_logger()
 
 
 @blob_router.post(
@@ -65,10 +67,8 @@ async def search_by_tags(
 ) -> list[Blob]:
     # TODO:
     blob_handler = BLOB_HANDLER_CLASSES[full_project_structure.deploy.deploy_type]()
-    params = dict(
-        parse.parse_qsl(parse.urlsplit(str(request.url)).query, keep_blank_values=True)
-    )
-    tags = [Tag(name=k, value=v) for k, v in params.items()]
+    tags = [Tag(name=k, value=v) for k, v in request.query_params.items()]
+    LOGGER.debug(f"Search tags: {tags}")
     s_time = time.time()
     response = await blob_handler.search_by_tags(full_project_structure, tags)
     e_time = time.time()

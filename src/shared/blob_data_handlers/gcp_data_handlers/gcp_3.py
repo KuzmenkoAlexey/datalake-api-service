@@ -1,7 +1,6 @@
 import json
 
-from google.cloud import bigquery
-from google.cloud.bigquery._helpers import _bytes_to_json
+from google.cloud import bigquery, storage
 from google.oauth2 import service_account
 from pydantic import BaseModel
 
@@ -20,11 +19,16 @@ class BigQueryResource(BaseModel):
     table: str
 
 
-class GCPDeployedResources1(BaseModel):
+class CloudStorage(BaseModel):
+    bucket: str
+
+
+class GCPDeployedResources3(BaseModel):
     bigquery: BigQueryResource
+    cloud_storage: CloudStorage
 
 
-class GCPBlobHandler1(BaseBlobHandler):
+class GCPBlobHandler3(BaseBlobHandler):
     async def update_blob_data(
         self,
         full_project_structure: FullProjectStructure,
@@ -33,7 +37,7 @@ class GCPBlobHandler1(BaseBlobHandler):
     ):
 
         blob_d = await self.get_blob_from_first_step(blob_id)
-        deployed_resources = GCPDeployedResources1(
+        deployed_resources = GCPDeployedResources3(
             **full_project_structure.deploy.project_structure
         )
         gcp_credentials_path = get_credentials_tmp_path(
@@ -43,6 +47,12 @@ class GCPBlobHandler1(BaseBlobHandler):
             filename=gcp_credentials_path,
             scopes=["https://www.googleapis.com/auth/cloud-platform"],
         )
+
+        storage_client = storage.Client(credentials=credentials)
+        bucket = storage_client.bucket(deployed_resources.cloud_storage.bucket)
+        blob = bucket.blob(blob_id)
+        blob.upload_from_string(processed_data.data)
+
         client = bigquery.Client(credentials=credentials)
         table_id = (
             f"{deployed_resources.bigquery.project}."
@@ -50,7 +60,6 @@ class GCPBlobHandler1(BaseBlobHandler):
             f"{deployed_resources.bigquery.table}"
         )
 
-        blob_d["file"] = _bytes_to_json(processed_data.data)
         blob_d["size"] = len(processed_data.data)
         blob_d["system_tags"] = [tag.dict() for tag in processed_data.system_tags]
         errors = client.insert_rows_json(table_id, [blob_d])
@@ -63,7 +72,7 @@ class GCPBlobHandler1(BaseBlobHandler):
     async def search_by_tags(
         self, full_project_structure: FullProjectStructure, tags: list[Tag]
     ):
-        deployed_resources = GCPDeployedResources1(
+        deployed_resources = GCPDeployedResources3(
             **full_project_structure.deploy.project_structure
         )
         gcp_credentials_path = get_credentials_tmp_path(
@@ -117,6 +126,8 @@ class GCPBlobHandler1(BaseBlobHandler):
                 )
             )
 
+        LOGGER.debug(f"SQL: {sql}")
+        LOGGER.debug(f"Query parameters: {query_parameters}")
         job_config = bigquery.QueryJobConfig(query_parameters=query_parameters)
         res = client.query(sql, job_config=job_config)
 
