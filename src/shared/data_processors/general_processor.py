@@ -41,11 +41,12 @@ class GeneralDataProcessor:
         content_type = self.content_type_to_internal_content_type(
             self.get_content_type_from_headers(request.headers)
         )
-        LOGGER.info(request.headers)
-        LOGGER.info(content_type)
+        LOGGER.info(f"Headers: {request.headers}")
+        LOGGER.info(f"Content-type: {content_type}")
         content_type_handler = CONTENT_TYPE_HANDLERS.get(
             content_type, DefaultDataProcessor
         )
+        LOGGER.debug(content_type_handler)
         processed_data = await content_type_handler().process_request(request)
 
         tags = self.extract_system_tags_from_headers(request.headers)
