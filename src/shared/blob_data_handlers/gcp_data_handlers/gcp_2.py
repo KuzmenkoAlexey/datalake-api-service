@@ -54,10 +54,11 @@ class GCPBlobHandler2(BaseBlobHandler):
         cf_name = "ColumnFamily"
 
         append_row = table.append_row(blob_id)
+        print(blob_d)
 
         append_row.append_cell_value(cf_name, "id", blob_id)
         append_row.append_cell_value(cf_name, "name", blob_d["name"])
-        append_row.append_cell_value(cf_name, "type", blob_d["content_type"])
+        append_row.append_cell_value(cf_name, "type", blob_d["type"])
         append_row.append_cell_value(cf_name, "size", "0")
         append_row.append_cell_value(cf_name, "timestamp", blob_d["timestamp"])
         append_row.append_cell_value(cf_name, "source", blob_d["source"])
@@ -141,4 +142,5 @@ class GCPBlobHandler2(BaseBlobHandler):
             rr["system_tags"] = system_tags
             rr["blob_id"] = r.row_key.decode()
             response.append(Blob(**rr))
+        print(len(response))
         return response

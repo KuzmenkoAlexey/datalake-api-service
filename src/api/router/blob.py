@@ -26,7 +26,10 @@ async def create_blob(
     blob_id = await blob_handler.insert_blob(full_project_structure, blob)
     e_time = time.time()
     await TimeTrackingBigQuery.track_time(
-        "create_blob", full_project_structure.deploy.deploy_type, e_time - s_time
+        "create_blob",
+        full_project_structure.deploy.deploy_type,
+        e_time - s_time,
+        e_time,
     )
     return Blob(**blob.dict(), blob_id=blob_id)
 
@@ -55,6 +58,7 @@ async def create_blob_data(
         "create_blob_data",
         full_project_structure.deploy.deploy_type,
         e_time - s_time,
+        e_time,
         content_type=content_type,
         content_size=content_size,
     )
@@ -77,7 +81,8 @@ async def search_by_tags(
         "search_by_tags",
         full_project_structure.deploy.deploy_type,
         e_time - s_time,
-        len(tags),
-        len(response),
+        e_time,
+        number_of_tags=len(tags),
+        number_of_blobs=len(response),
     )
     return response

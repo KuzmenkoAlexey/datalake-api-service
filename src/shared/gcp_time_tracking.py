@@ -41,6 +41,7 @@ class TimeTrackingBigQuery:
         request_type: str,
         deploy_type: str,
         request_time: float,
+        created_at: float,
         number_of_tags: int | None = None,
         number_of_blobs: int | None = None,
         content_size: int | None = None,
@@ -51,6 +52,7 @@ class TimeTrackingBigQuery:
                 f"{cls.project}.{cls.dataset_name}.{cls.table_name}",
                 [
                     {
+                        "created_at": created_at,
                         "request_type": request_type,
                         "deploy_type": deploy_type,
                         "request_time": request_time,
