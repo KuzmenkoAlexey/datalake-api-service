@@ -124,6 +124,7 @@ class AWSBlobHandler1(BaseBlobHandler):
             index="test",
             doc_type="_doc",
             body={"query": {"bool": {"must": must_query}}},
+            size=1500,
         )
         return [
             Blob(**hit["_source"], blob_id=hit["_source"]["id"])

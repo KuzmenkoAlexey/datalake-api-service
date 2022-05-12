@@ -135,4 +135,6 @@ class GCPBlobHandler1(BaseBlobHandler):
                 )
             )
 
+        print(len(response))
+
         return response

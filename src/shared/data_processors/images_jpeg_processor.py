@@ -20,10 +20,10 @@ class ImagesJpegProcessor(BaseDataProcessor):
         image_data = await request.body()
 
         # exiftool necessarily needs the path to the file to work
-        with tempfile.NamedTemporaryFile() as tf, exiftool.ExifTool() as et:
+        with tempfile.NamedTemporaryFile() as tf, exiftool.ExifToolHelper() as et:
             tf.write(image_data)
             tf.seek(0)
-            metadata = et.get_metadata(tf.name)
+            metadata = et.get_metadata(tf.name)[0]
 
         tags = convert_metadata_to_tags_list(metadata)
 
