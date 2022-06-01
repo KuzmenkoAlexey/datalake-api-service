@@ -4,7 +4,7 @@ pydantic==1.9.0
 motor==2.5.1
 sentry-sdk==1.5.11
 python-jose==3.3.0
-httpx==0.22.0
+httpx==0.23.0
 
 # aioprometheus[starlette]==21.9.1
 
