@@ -18,7 +18,7 @@ requests-aws4auth==1.1.2
 opensearch-py==1.1.0
 
 # GCP
-google-cloud-bigquery==3.0.1
+google-cloud-bigquery==3.3.0
 google-cloud-bigtable==2.9.0
 google-cloud-storage==2.3.0
 
